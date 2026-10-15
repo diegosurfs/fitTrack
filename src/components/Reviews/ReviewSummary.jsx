@@ -1,21 +1,21 @@
-"use client";
+"use client"; // Marks this module for client-side use in Next.js.
 
-// Display a placeholder for the restaurant review summary.
-export async function GeminiSummary({ restaurantId }) {
+// Displays a placeholder for the restaurant review summary.
+export async function GeminiSummary({ restaurantId }) { // Defines the summary component and receives the restaurant ID.
   // Show a message until review summarization is implemented.
-  return (
-    <div className="restaurant__review_summary">
-      <p>Review summary coming soon.</p>
+  return ( // Returns the summary markup.
+    <div className="restaurant__review_summary"> {/* Creates the summary container. */}
+      <p>Review summary coming soon.</p> {/* Displays the placeholder message. */}
     </div>
-  );
-}
+  ); // Ends the return statement.
+} // Ends the GeminiSummary component.
 
-// Display a loading message while the summary is being prepared.
-export function GeminiSummarySkeleton() {
+// Displays a loading message while the summary is being prepared.
+export function GeminiSummarySkeleton() { // Defines the loading placeholder component.
   // Let users know the summary is being prepared.
-  return (
-    <div className="restaurant__review_summary">
-      <p>✨ Summarizing reviews with Gemini...</p>
+  return ( // Returns the loading markup.
+    <div className="restaurant__review_summary"> {/* Creates the loading container. */}
+      <p>✨ Summarizing reviews with Gemini...</p> {/* Displays the loading message. */}
     </div>
-  );
-}
+  ); // Ends the return statement.
+} // Ends the GeminiSummarySkeleton component.
