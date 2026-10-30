@@ -1,58 +1,37 @@
+
 "use client";
 
-// This components handles the restaurant listings page
-// It receives data from src/app/page.jsx, such as the initial restaurants and search params from the URL
-
 import Link from "next/link";
-import { React, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import renderStars from "@/src/components/Stars.jsx";
 import { getRestaurantsSnapshot } from "@/src/lib/firebase/firestore.js";
 import Filters from "@/src/components/Filters.jsx";
 
-const RestaurantItem = ({ restaurant }) => (
-  <li key={restaurant.id}>
+const WorkoutItem = ({ restaurant }) => (
+  <li>
     <Link href={`/restaurant/${restaurant.id}`}>
-      <ActiveResturant restaurant={restaurant} />
+      <div>
+        <div className="image-cover">
+          <img src={restaurant.photo} alt={restaurant.name} />
+        </div>
+
+        <div className="restaurant__details">
+          <h2>{restaurant.name}</h2>
+
+          <div className="restaurant__rating">
+            <ul>{renderStars(restaurant.avgRating)}</ul>
+            <span>({restaurant.numRatings} reviews)</span>
+          </div>
+
+          <div className="restaurant__meta">
+            <p>{restaurant.category} | {restaurant.city}</p>
+            <p>{restaurant.duration} minutes</p>
+          </div>
+        </div>
+      </div>
     </Link>
   </li>
-);
-
-const ActiveResturant = ({ restaurant }) => (
-  <div>
-    <ImageCover photo={restaurant.photo} name={restaurant.name} />
-    <ResturantDetails restaurant={restaurant} />
-  </div>
-);
-
-const ImageCover = ({ photo, name }) => (
-  <div className="image-cover">
-    <img src={photo} alt={name} />
-  </div>
-);
-
-const ResturantDetails = ({ restaurant }) => (
-  <div className="restaurant__details">
-    <h2>{restaurant.name}</h2>
-    <RestaurantRating restaurant={restaurant} />
-    <RestaurantMetadata restaurant={restaurant} />
-  </div>
-);
-
-const RestaurantRating = ({ restaurant }) => (
-  <div className="restaurant__rating">
-    <ul>{renderStars(restaurant.avgRating)}</ul>
-    <span>({restaurant.numRatings})</span>
-  </div>
-);
-
-const RestaurantMetadata = ({ restaurant }) => (
-  <div className="restaurant__meta">
-    <p>
-      {restaurant.category} | {restaurant.city}
-    </p>
-    <p>{"$".repeat(restaurant.price)}</p>
-  </div>
 );
 
 export default function RestaurantListings({
@@ -61,7 +40,6 @@ export default function RestaurantListings({
 }) {
   const router = useRouter();
 
-  // The initial filters are the search params from the URL, useful for when the user refreshes the page
   const initialFilters = {
     city: searchParams.city || "",
     category: searchParams.category || "",
@@ -84,10 +62,19 @@ export default function RestaurantListings({
 
   return (
     <article>
+      <header className="fittrack-header">
+        <h1>FITTRACK</h1>
+        <h2>Build Your Best Self.</h2>
+        <p>Discover workouts. Build strength. Stay consistent.</p>
+      </header>
+
+      <h2>Explore Workouts</h2>
+
       <Filters filters={filters} setFilters={setFilters} />
+
       <ul className="restaurants">
-        {restaurants.map((restaurant) => (
-          <RestaurantItem key={restaurant.id} restaurant={restaurant} />
+        {restaurants.map((workout) => (
+          <WorkoutItem key={workout.id} restaurant={workout} />
         ))}
       </ul>
     </article>

@@ -3,14 +3,14 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+
 import {
   signInWithGoogle,
   signOut,
   onIdTokenChanged,
 } from "@/src/lib/firebase/auth";
-import { addFakeRestaurantsAndReviews } from "@/src/lib/firebase/firestore";
 
-function useUserSession(initialUser) {
+import { addFakeWorkoutsAndReviews } from "@/src/lib/firebase/firestore.js";function useUserSession(initialUser) {
   const [user, setUser] = useState(initialUser);
 
   useEffect(() => {
@@ -34,6 +34,7 @@ export default function Header({ initialUser }) {
 
   const handleSignIn = async (event) => {
     event.preventDefault();
+
     try {
       await signInWithGoogle();
     } catch (error) {
@@ -42,14 +43,15 @@ export default function Header({ initialUser }) {
     }
   };
 
-  const handleAddRestaurants = async (event) => {
+  const handleAddWorkouts = async (event) => {
     event.preventDefault();
+
     try {
-      await addFakeRestaurantsAndReviews();
-      alert("Sample restaurants added!");
+      await addFakeWorkoutsAndReviews();
+      alert("Sample workouts added successfully!");
       setMenuOpen(false);
     } catch (error) {
-      console.error("Could not add sample restaurants:", error);
+      console.error("Could not add sample workouts:", error);
       alert(error.message);
     }
   };
@@ -57,8 +59,7 @@ export default function Header({ initialUser }) {
   return (
     <header>
       <Link href="/" className="logo">
-        <img src="/friendlyeats.svg" alt="Friendly Eats" />
-        Friendly Eats
+        FITTRACK
       </Link>
 
       {user ? (
@@ -90,8 +91,8 @@ export default function Header({ initialUser }) {
               <ul>
                 <li>{user.displayName || user.email}</li>
                 <li>
-                  <a href="#" onClick={handleAddRestaurants}>
-                    Add sample restaurants
+                  <a href="#" onClick={handleAddWorkouts}>
+                    Add sample workouts
                   </a>
                 </li>
                 <li>

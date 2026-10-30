@@ -1,5 +1,4 @@
-import { generateFakeRestaurantsAndReviews } from "@/src/lib/fakeRestaurants.js"; // Imports the function that creates sample restaurant data.
-
+import { generateFakeRestaurantsAndReviews } from "@/src/lib/fakeRestaurants.js";
 // Imports the Firestore functions used to read, write, filter, and listen to database documents.
 import {
   collection, // References a Firestore collection.
@@ -21,7 +20,7 @@ import { db as clientDb } from "@/src/lib/firebase/clientApp"; // Renames db to 
 
 // Updates a restaurant document with its uploaded image URL.
 export async function updateRestaurantImageReference(restaurantId, publicImageUrl) { // Defines the image reference update function.
-  const restaurantRef = doc(clientDb, "restaurants", restaurantId); // Gets a reference to the restaurant document.
+  const restaurantRef = doc(clientDb, "workouts", restaurantId); // Gets a reference to the restaurant document.
   await updateDoc(restaurantRef, { photo: publicImageUrl }); // Saves the public image URL in Firestore.
 } // Ends the image reference update function.
 
@@ -43,8 +42,8 @@ const updateWithRating = async (transaction, docRef, newRatingDocument, review) 
 
 // Adds a review to a restaurant and updates its rating statistics.
 export async function addReviewToRestaurant(firestoreDb, restaurantId, review) { // Defines the review submission function.
-  const restaurantRef = doc(firestoreDb, "restaurants", restaurantId); // References the restaurant being reviewed.
-  const newRatingDocument = doc(collection(firestoreDb, "restaurants", restaurantId, "ratings")); // Creates a reference for a new review.
+  const restaurantRef = doc(firestoreDb, "workouts", restaurantId); // References the restaurant being reviewed.
+  const newRatingDocument = doc(collection(firestoreDb, "workouts", restaurantId, "ratings")); // Creates a reference for a new review.
   return runTransaction(firestoreDb, async (transaction) => { // Starts an atomic transaction.
     await updateWithRating(transaction, restaurantRef, newRatingDocument, review); // Updates the restaurant and saves the review.
   }); // Ends and returns the transaction.
@@ -53,28 +52,28 @@ export async function addReviewToRestaurant(firestoreDb, restaurantId, review) {
 // Applies the selected category, city, price, and sorting filters.
 function applyQueryFilters(q, { category, city, price, sort } = {}) { // Defines the query filtering helper.
   if (category) { // Checks whether a category was selected.
-    q = query(q, where("category", "==", category)); // Filters restaurants by category.
+    q = query(q, where("category", "==", category)); // Filters workouts by category.
   } // Ends the category filter.
   if (city) { // Checks whether a city was selected.
-    q = query(q, where("city", "==", city)); // Filters restaurants by city.
+    q = query(q, where("city", "==", city)); // Filters workouts by city.
   } // Ends the city filter.
   if (price) { // Checks whether a price level was selected.
-    q = query(q, where("price", "==", Number(price))); // Filters restaurants by price level.
+    q = query(q, where("price", "==", Number(price))); // Filters workouts by price level.
   } // Ends the price filter.
   if (sort === "Rating") { // Checks whether results should be sorted by rating.
-    q = query(q, orderBy("avgRating", "desc")); // Shows higher-rated restaurants first.
+    q = query(q, orderBy("avgRating", "desc")); // Shows higher-rated workouts first.
   } else if (sort === "Reviews") { // Checks whether results should be sorted by review count.
-    q = query(q, orderBy("numRatings", "desc")); // Shows restaurants with more reviews first.
+    q = query(q, orderBy("numRatings", "desc")); // Shows workouts with more reviews first.
   } else { // Uses the default sorting when no recognized sort is selected.
-    q = query(q, orderBy("timestamp", "desc")); // Shows the most recently added restaurants first.
+    q = query(q, orderBy("timestamp", "desc")); // Shows the most recently added workouts first.
   } // Ends the sorting conditions.
   return q; // Returns the completed query.
 } // Ends the query filtering helper.
 
 // Retrieves restaurant documents that match the supplied filters.
-export async function getRestaurants(firestoreDb = clientDb, filters = {}) { // Defines the restaurant retrieval function.
-  const restaurantsQuery = applyQueryFilters(collection(firestoreDb, "restaurants"), filters); // Creates the filtered restaurant query.
-  const results = await getDocs(restaurantsQuery); // Retrieves the matching restaurant documents.
+export async function getworkouts(firestoreDb = clientDb, filters = {}) { // Defines the restaurant retrieval function.
+  const workoutsQuery = applyQueryFilters(collection(firestoreDb, "workouts"), filters); // Creates the filtered restaurant query.
+  const results = await getDocs(workoutsQuery); // Retrieves the matching restaurant documents.
   return results.docs.map((restaurantDoc) => ({ // Converts each document into a JavaScript object.
     id: restaurantDoc.id, // Includes the restaurant document ID.
     ...restaurantDoc.data(), // Includes the restaurant's stored fields.
@@ -83,15 +82,15 @@ export async function getRestaurants(firestoreDb = clientDb, filters = {}) { // 
 } // Ends the restaurant retrieval function.
 
 // Listens for real-time updates to the filtered restaurant collection.
-export function getRestaurantsSnapshot(cb, filters = {}) { // Defines the restaurant snapshot listener.
-  const restaurantsQuery = applyQueryFilters(collection(clientDb, "restaurants"), filters); // Creates the filtered query.
-  return onSnapshot(restaurantsQuery, (querySnapshot) => { // Subscribes to changes in the query results.
+export function getworkoutsSnapshot(cb, filters = {}) { // Defines the restaurant snapshot listener.
+  const workoutsQuery = applyQueryFilters(collection(clientDb, "workouts"), filters); // Creates the filtered query.
+  return onSnapshot(workoutsQuery, (querySnapshot) => { // Subscribes to changes in the query results.
     const results = querySnapshot.docs.map((restaurantDoc) => ({ // Converts each document into an object.
       id: restaurantDoc.id, // Includes the restaurant ID.
       ...restaurantDoc.data(), // Includes the restaurant data.
       timestamp: restaurantDoc.data().timestamp?.toDate?.() ?? null, // Converts the timestamp to a JavaScript date when available.
     })); // Ends the mapping operation.
-    cb(results); // Sends the updated restaurants to the callback.
+    cb(results); // Sends the updated workouts to the callback.
   }); // Returns the listener so callers can unsubscribe.
 } // Ends the restaurant snapshot function.
 
@@ -101,7 +100,7 @@ export async function getRestaurantById(firestoreDb, restaurantId) { // Defines 
     console.log("Error: Invalid ID received: ", restaurantId); // Logs the invalid ID.
     return; // Stops when the ID is missing.
   } // Ends the ID check.
-  const docRef = doc(firestoreDb, "restaurants", restaurantId); // References the restaurant document.
+  const docRef = doc(firestoreDb, "workouts", restaurantId); // References the restaurant document.
   const docSnap = await getDoc(docRef); // Retrieves the document.
   if (!docSnap.exists()) { // Checks whether the document exists.
     return null; // Returns null if the restaurant cannot be found.
@@ -111,12 +110,12 @@ export async function getRestaurantById(firestoreDb, restaurantId) { // Defines 
 } // Ends the restaurant retrieval function.
 
 // Listens for real-time changes to one restaurant.
-export function getRestaurantSnapshotById(restaurantId, cb) { // Defines the individual restaurant listener.
+export function getworkoutsnapshotById(restaurantId, cb) { // Defines the individual restaurant listener.
   if (!restaurantId) { // Checks whether a restaurant ID was provided.
     console.log("Error: Invalid ID received: ", restaurantId); // Logs the invalid ID.
     return () => {}; // Returns a harmless cleanup function.
   } // Ends the ID check.
-  const docRef = doc(clientDb, "restaurants", restaurantId); // References the restaurant document.
+  const docRef = doc(clientDb, "workouts", restaurantId); // References the restaurant document.
   return onSnapshot(docRef, (docSnap) => { // Listens for document updates.
     if (docSnap.exists()) { // Checks whether the document exists.
       const data = docSnap.data(); // Reads the updated restaurant data.
@@ -132,7 +131,7 @@ export async function getReviewsByRestaurantId(firestoreDb, restaurantId) { // D
     return []; // Returns an empty array when the ID is missing.
   } // Ends the ID check.
   const q = query( // Creates the reviews query.
-    collection(firestoreDb, "restaurants", restaurantId, "ratings"), // References the restaurant's ratings subcollection.
+    collection(firestoreDb, "workouts", restaurantId, "ratings"), // References the restaurant's ratings subcollection.
     orderBy("timestamp", "desc") // Sorts reviews from newest to oldest.
   ); // Ends the query.
   const results = await getDocs(q); // Retrieves the reviews.
@@ -150,7 +149,7 @@ export function getReviewsSnapshotByRestaurantId(restaurantId, cb) { // Defines 
     return () => {}; // Returns a harmless cleanup function.
   } // Ends the ID check.
   const q = query( // Creates the review query.
-    collection(clientDb, "restaurants", restaurantId, "ratings"), // References the restaurant's ratings subcollection.
+    collection(clientDb, "workouts", restaurantId, "ratings"), // References the restaurant's ratings subcollection.
     orderBy("timestamp", "desc") // Sorts reviews from newest to oldest.
   ); // Ends the query.
   return onSnapshot(q, (querySnapshot) => { // Listens for changes to the reviews.
@@ -163,14 +162,13 @@ export function getReviewsSnapshotByRestaurantId(restaurantId, cb) { // Defines 
   }); // Returns the listener for cleanup.
 } // Ends the review snapshot function.
 
-// Adds sample restaurants and reviews to Firestore.
-export async function addFakeRestaurantsAndReviews() { // Defines the sample data function.
-  const data = await generateFakeRestaurantsAndReviews(); // Generates sample restaurant and review data.
-  for (const { restaurantData, ratingsData } of data) { // Iterates over each restaurant and its reviews.
+// Adds sample workouts and reviews to Firestore.
+export async function addFakeworkoutsAndReviews() { // Defines the sample data function.
+const data = await generateFakeRestaurantsAndReviews();  for (const { restaurantData, ratingsData } of data) { // Iterates over each restaurant and its reviews.
     try { // Starts error handling for each restaurant.
-      const docRef = await addDoc(collection(clientDb, "restaurants"), restaurantData); // Creates the restaurant document.
+      const docRef = await addDoc(collection(clientDb, "workouts"), restaurantData); // Creates the restaurant document.
       for (const ratingData of ratingsData) { // Iterates over the restaurant's sample reviews.
-        await addDoc(collection(clientDb, "restaurants", docRef.id, "ratings"), ratingData); // Adds each review to its ratings subcollection.
+        await addDoc(collection(clientDb, "workouts", docRef.id, "ratings"), ratingData); // Adds each review to its ratings subcollection.
       } // Ends the review loop.
     } catch (e) { // Handles errors while adding sample data.
       console.log("There was an error adding the document"); // Logs a general error message.
@@ -178,3 +176,9 @@ export async function addFakeRestaurantsAndReviews() { // Defines the sample dat
     } // Ends the error handler.
   } // Ends the restaurant loop.
 } // Ends the sample data function.
+// Backward-compatible names used by existing application components.
+export {
+  getworkouts as getRestaurants,
+  getworkoutsSnapshot as getRestaurantsSnapshot,
+  addFakeworkoutsAndReviews as addFakeWorkoutsAndReviews,
+};
